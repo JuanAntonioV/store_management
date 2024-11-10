@@ -19,11 +19,8 @@ Future getAllProduct(String? search) async {
   final response = await http.get(url);
   if (jsonDecode(response.body)['code'] == 200) {
     final List<dynamic> data = jsonDecode(response.body)['data'];
-    print('produk data: $data');
     List<ProductModel> products =
         data.map((e) => ProductModel.fromJson(e)).toList();
-
-    print('produk: $products');
     return products;
   } else {
     throw Exception(jsonDecode(response.body)['message']);
@@ -39,14 +36,6 @@ Future createProduct(
 ) async {
   final baseUrl = dotenv.env['API_URL']!;
   var url = Uri.parse(baseUrl + '/products');
-
-  print({
-    'name': name,
-    'price': price,
-    'description': description,
-    'stock': stock,
-    'image': image,
-  });
 
   try {
     // Create a multipart request

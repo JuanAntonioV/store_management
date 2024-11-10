@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:store_management/db/product_db.dart';
 import 'package:store_management/models/product_model.dart';
 import 'package:store_management/controllers/search_controller.dart'
     as search_controller;
@@ -15,18 +18,41 @@ class DraftProductList extends StatefulWidget {
 class _DraftProductListState extends State<DraftProductList> {
   final searchController = Get.put(search_controller.SearchController());
 
-  List<ProductModel> products = [
-    ProductModel(name: 'Product 1', price: 10000, status: 2),
-    ProductModel(name: 'Product 2', price: 20000, status: 2),
-    ProductModel(name: 'Product 3', price: 30000, status: 2),
-    ProductModel(name: 'Product 4', price: 40000, status: 2),
-    ProductModel(name: 'Product 5', price: 50000, status: 2),
-    ProductModel(name: 'Product 6', price: 60000, status: 2),
-    ProductModel(name: 'Product 7', price: 70000, status: 2),
-    ProductModel(name: 'Product 8', price: 80000, status: 2),
-    ProductModel(name: 'Product 9', price: 90000, status: 2),
-    ProductModel(name: 'Product 10', price: 100000, status: 2),
-  ];
+  late StreamController<List<ProductModel>> _streamController;
+  late Stream<List<ProductModel>> _stream;
+  late StreamSubscription<String> _searchSubscription;
+  final productDb = ProductDB();
+
+  @override
+  void initState() {
+    super.initState();
+    _streamController = StreamController<List<ProductModel>>();
+    _stream = _streamController.stream;
+
+    fetchProducts(null);
+
+    _searchSubscription = searchController.search.listen((search) {
+      fetchProducts(search);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchSubscription.cancel();
+    _streamController.close();
+    super.dispose();
+  }
+
+  void fetchProducts(String? search) async {
+    try {
+      final data = await productDb.getAll(search);
+      print(data);
+      _streamController.add(data);
+    } catch (e) {
+      print(e);
+      _streamController.addError(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +75,57 @@ class _DraftProductListState extends State<DraftProductList> {
             return const SizedBox.shrink();
           }),
           Flexible(
-            child: ListView(
-              padding: EdgeInsets.zero, // Remove any padding from the ListView
-              children: products
-                  .map((product) => ProductCard(item: product))
-                  .toList(),
+            child: StreamBuilder<List<ProductModel>>(
+              stream: _stream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Container(
+                    child: const Center(
+                      child: Text(
+                        'Error: Gagal memuat data',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  );
+                } else if (snapshot.hasData) {
+                  if (snapshot.hasData && snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'Tidak ada data',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView(
+                    padding:
+                        EdgeInsets.zero, // Remove any padding from the ListView
+                    children: snapshot.data!
+                        .map((product) => ProductCard(item: product))
+                        .toList(),
+                  );
+                } else {
+                  return const Center(
+                    child: Text(
+                      'Tidak ada data',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ],
