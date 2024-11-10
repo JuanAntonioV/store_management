@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:store_management/routes/routes.dart';
+import 'package:store_management/services/auth_service.dart';
 
 class RegisterController extends GetxController {
   final formKey = GlobalKey<FormState>();
   var isLoading = false.obs;
 
-  // final _auth = AuthService();
+  final _auth = AuthService();
 
-  var name = ''.obs;
-  var email = ''.obs;
-  var password = ''.obs;
+  RxString name = ''.obs;
+  RxString email = ''.obs;
+  RxString password = ''.obs;
 
   validateName(String? name) {
     if (GetUtils.isNullOrBlank(name ?? '') == null) {
@@ -56,28 +58,28 @@ class RegisterController extends GetxController {
     isLoading(true);
 
     if (formKey.currentState!.validate()) {
-      // final result = await _auth.createUserWithEmailAndPassword(
-      //   name.value,
-      //   email.value,
-      //   password.value,
-      // );
+      final result = await _auth.signUpWithEmailAndPassword(
+        name.value,
+        email.value,
+        password.value,
+      );
 
-      // if (result != null) {
-      //   Get.snackbar(
-      //     'Berhasil',
-      //     'Pendaftaran berhasil',
-      //     snackPosition: SnackPosition.BOTTOM,
-      //     margin: EdgeInsets.all(10),
-      //     backgroundColor: primary,
-      //     colorText: Colors.white,
-      //     duration: Duration(seconds: 2),
-      //     animationDuration: Duration(milliseconds: 300),
-      //   );
-      //   isLoading(false);
-      //   clearForm();
-      //   Get.offAllNamed(Routes.login);
-      //   return;
-      // }
+      if (result != null) {
+        Get.snackbar(
+          'Berhasil',
+          'Pendaftaran berhasil',
+          snackPosition: SnackPosition.BOTTOM,
+          margin: EdgeInsets.all(10),
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 2),
+          animationDuration: Duration(milliseconds: 300),
+        );
+        isLoading(false);
+        clearForm();
+        Get.offAllNamed(Routes.login);
+        return;
+      }
 
       isLoading(false);
       return;

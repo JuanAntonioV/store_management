@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:store_management/routes/routes.dart';
+import 'package:store_management/services/auth_service.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -8,7 +10,7 @@ class LoginController extends GetxController {
   var email = ''.obs;
   var password = ''.obs;
 
-  // final _auth = AuthService();
+  final _auth = AuthService();
 
   validateEmail(String? email) {
     if (!GetUtils.isEmail(email ?? '')) {
@@ -34,28 +36,34 @@ class LoginController extends GetxController {
     password.value = value;
   }
 
+  clearForm() {
+    email.value = '';
+    password.value = '';
+  }
+
   Future onLogin() async {
     isLoading(true);
 
     if (formKey.currentState!.validate()) {
-      // final user =
-      // await _auth.signInWithEmailAndPassword(email.value, password.value);
+      final user =
+          await _auth.signInWithEmailAndPassword(email.value, password.value);
 
-      // if (user != null) {
-      //   Get.snackbar(
-      //     'Berhasil',
-      //     'Login berhasil',
-      //     snackPosition: SnackPosition.BOTTOM,
-      //     margin: EdgeInsets.all(10),
-      //     backgroundColor: Colors.green,
-      //     colorText: Colors.white,
-      //     duration: Duration(seconds: 2),
-      //     animationDuration: Duration(milliseconds: 300),
-      //   );
-      //   isLoading(false);
-      //   Get.toNamed(Routes.home);
-      //   return;
-      // }
+      if (user != null) {
+        Get.snackbar(
+          'Berhasil',
+          'Login berhasil',
+          snackPosition: SnackPosition.BOTTOM,
+          margin: EdgeInsets.all(10),
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 2),
+          animationDuration: Duration(milliseconds: 300),
+        );
+        isLoading(false);
+        clearForm();
+        Get.toNamed(Routes.home);
+        return;
+      }
       isLoading(false);
       return;
     }
