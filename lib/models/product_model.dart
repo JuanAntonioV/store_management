@@ -34,6 +34,7 @@ class ProductModel {
     data['name'] = this.name;
     data['description'] = this.description;
     data['price'] = this.price;
+    data['status'] = this.status;
     data['stock'] = this.stock;
     data['image'] = this.image;
     return data;
