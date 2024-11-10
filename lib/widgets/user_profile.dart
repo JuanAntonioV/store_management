@@ -37,9 +37,7 @@ class _UserProfileState extends State<UserProfile> {
             CircleAvatar(
               radius: profileHeight / 2,
               backgroundColor: Colors.grey.shade800,
-              backgroundImage: NetworkImage(
-                'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png',
-              ),
+              backgroundImage: AssetImage('assets/images/store.jpg'),
             ),
             const SizedBox(width: 10),
             Column(
