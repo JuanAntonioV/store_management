@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:store_management/routes/routes.dart';
 // import 'package:get/get.dart';
 // import 'package:store_management/routes/routes.dart';
 import 'package:store_management/services/auth_service.dart';
@@ -25,7 +27,9 @@ class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Get.toNamed(Routes.profile);
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(

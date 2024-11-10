@@ -66,6 +66,34 @@ class ProductController extends GetxController {
     image.value = File('');
   }
 
+  void onNameChanged(String value) {
+    name.value = value;
+  }
+
+  void onPriceChanged(String value) {
+    price.value = int.parse(value);
+  }
+
+  void onStockChanged(String value) {
+    stock.value = int.parse(value);
+  }
+
+  void onDescriptionChanged(String value) {
+    description.value = value;
+  }
+
+  void onIsDraftChanged(bool value) {
+    isDraft.value = value;
+  }
+
+  void onImageChanged(File? value) {
+    if (value != null) {
+      image.value = value;
+    } else {
+      image.value = File('');
+    }
+  }
+
   Future onAddProduct() async {
     isLoading(true);
 
@@ -142,31 +170,158 @@ class ProductController extends GetxController {
     }
   }
 
-  void onNameChanged(String value) {
-    name.value = value;
-  }
+  Future onEditProduct(ProductModel product) async {
+    isLoading(true);
 
-  void onPriceChanged(String value) {
-    price.value = int.parse(value);
-  }
+    if (formKey.currentState!.validate()) {
+      if (isDraft.value == false) {
+        try {
+          final res = await updateProduct(
+            product.id,
+            name.value,
+            description.value,
+            null,
+            price.value,
+            stock.value,
+          );
 
-  void onStockChanged(String value) {
-    stock.value = int.parse(value);
-  }
+          if (res != null) {
+            Get.snackbar(
+              'Berhasil',
+              'Produk berhasil diupdate',
+              snackPosition: SnackPosition.BOTTOM,
+              margin: EdgeInsets.all(10),
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: Duration(seconds: 2),
+              animationDuration: Duration(milliseconds: 300),
+            );
+            Get.toNamed(Routes.home);
+          } else {
+            // create product
+            final res = await createProduct(
+              name.value,
+              description.value,
+              null,
+              price.value,
+              stock.value,
+            );
 
-  void onDescriptionChanged(String value) {
-    description.value = value;
-  }
+            if (res != null) {
+              Get.snackbar(
+                'Berhasil',
+                'Produk berhasil ditambahkan ke database',
+                snackPosition: SnackPosition.BOTTOM,
+                margin: EdgeInsets.all(10),
+                backgroundColor: Colors.green,
+                colorText: Colors.white,
+                duration: Duration(seconds: 2),
+                animationDuration: Duration(milliseconds: 300),
+              );
+              Get.toNamed(Routes.home);
+            }
+          }
+        } catch (e) {
+          print(e);
+          Get.snackbar(
+            'Gagal',
+            e.toString(),
+            snackPosition: SnackPosition.BOTTOM,
+            margin: EdgeInsets.all(10),
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: Duration(seconds: 2),
+            animationDuration: Duration(milliseconds: 300),
+          );
+        }
+      } else {
+        // save to local sqllite
+        final productDb = ProductDB();
 
-  void onIsDraftChanged(bool value) {
-    isDraft.value = value;
-  }
+        final productPayload = ProductModel(
+          id: product.id,
+          name: name.value,
+          price: price.value,
+          stock: stock.value,
+          status: 2,
+          description: description.value,
+          image: null,
+        );
 
-  void onImageChanged(File? value) {
-    if (value != null) {
-      image.value = value;
-    } else {
-      image.value = File('');
+        await productDb.update(productPayload);
+        await productDb.getAll(null);
+
+        Get.snackbar(
+          'Berhasil',
+          'Produk berhasil diupdate ke draft',
+          snackPosition: SnackPosition.BOTTOM,
+          margin: EdgeInsets.all(10),
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 2),
+          animationDuration: Duration(milliseconds: 300),
+        );
+        Get.toNamed(Routes.home);
+      }
+
+      // clear all input
+      clearAll();
+
+      isLoading(false);
     }
+  }
+
+  Future onDeleteProduct(ProductModel product) async {
+    isLoading(true);
+
+    if (product.status == 2) {
+      final productDb = ProductDB();
+      await productDb.delete(product.id);
+      await productDb.getAll(null);
+
+      Get.snackbar(
+        'Berhasil',
+        'Produk berhasil dihapus dari draft',
+        snackPosition: SnackPosition.BOTTOM,
+        margin: EdgeInsets.all(10),
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: Duration(seconds: 2),
+        animationDuration: Duration(milliseconds: 300),
+      );
+      Get.toNamed(Routes.home);
+    } else {
+      try {
+        final res = await deleteProduct(product.id);
+
+        if (res != null) {
+          Get.snackbar(
+            'Berhasil',
+            'Produk berhasil dihapus',
+            snackPosition: SnackPosition.BOTTOM,
+            margin: EdgeInsets.all(10),
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: Duration(seconds: 2),
+            animationDuration: Duration(milliseconds: 300),
+          );
+          Get.toNamed(Routes.home);
+        }
+      } catch (e) {
+        print(e);
+        Get.snackbar(
+          'Gagal',
+          e.toString(),
+          snackPosition: SnackPosition.BOTTOM,
+          margin: EdgeInsets.all(10),
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 2),
+          animationDuration: Duration(milliseconds: 300),
+        );
+      }
+    }
+
+    isLoading(false);
   }
 }

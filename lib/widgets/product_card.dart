@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 // import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:store_management/models/product_model.dart';
+import 'package:store_management/routes/routes.dart';
 // import 'package:store_management/routes/routes.dart';
 
 class ProductCard extends StatelessWidget {
@@ -19,7 +21,7 @@ class ProductCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => {
-        // Get.toNamed(Routes.productDetail),
+        Get.toNamed(Routes.editProduct, arguments: item),
       },
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8),
@@ -63,15 +65,6 @@ class ProductCard extends StatelessWidget {
                 children: [
                   Text(
                     formatCurrency.format(item.price),
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    item.status.toString(),
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
