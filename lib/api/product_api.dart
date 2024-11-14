@@ -27,6 +27,20 @@ Future getAllProduct(String? search) async {
   }
 }
 
+Future getProductDetail(int id) async {
+  final baseUrl = dotenv.env['API_URL']!;
+  var url = Uri.parse(baseUrl + '/products/$id');
+
+  final response = await http.get(url);
+  if (jsonDecode(response.body)['code'] == 200) {
+    final data = jsonDecode(response.body)['data'];
+    ProductModel product = ProductModel.fromJson(data);
+    return product;
+  } else if (jsonDecode(response.body)['code'] != 404) {
+    throw Exception(jsonDecode(response.body)['message']);
+  }
+}
+
 Future createProduct(
   String name,
   String? description,

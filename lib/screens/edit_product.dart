@@ -19,6 +19,9 @@ class EditProductScreen extends StatefulWidget {
 class _EditProductScreenState extends State<EditProductScreen> {
   final controller = Get.put(ProductController());
 
+  // get item from arguments
+  final item = Get.arguments as ProductModel;
+
   XFile? image;
 
   final ImagePicker picker = ImagePicker();
@@ -176,17 +179,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       const SizedBox(
                         height: 20,
                       ),
-                      // make toogle button
-                      Obx(
-                        () => SwitchListTile(
-                          title: Text('Draft'),
-                          value: controller.isDraft.value,
-                          activeColor: Theme.of(context).primaryColor,
-                          onChanged: (value) {
-                            controller.onIsDraftChanged(value);
-                          },
+                      if (item.status != 1)
+                        Obx(
+                          () => SwitchListTile(
+                            title: Text('Draft'),
+                            value: controller.isDraft.value,
+                            activeColor: Theme.of(context).primaryColor,
+                            onChanged: (value) {
+                              controller.onIsDraftChanged(value);
+                            },
+                          ),
                         ),
-                      ),
                       // make input to upload image
                       // image != null
                       //     ? Padding(

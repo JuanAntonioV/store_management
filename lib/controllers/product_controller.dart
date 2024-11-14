@@ -176,27 +176,33 @@ class ProductController extends GetxController {
     if (formKey.currentState!.validate()) {
       if (isDraft.value == false) {
         try {
-          final res = await updateProduct(
+          final productData = await getProductDetail(
             product.id,
-            name.value,
-            description.value,
-            null,
-            price.value,
-            stock.value,
           );
 
-          if (res != null) {
-            Get.snackbar(
-              'Berhasil',
-              'Produk berhasil diupdate',
-              snackPosition: SnackPosition.BOTTOM,
-              margin: EdgeInsets.all(10),
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
-              duration: Duration(seconds: 2),
-              animationDuration: Duration(milliseconds: 300),
+          if (productData != null) {
+            final res = await updateProduct(
+              product.id,
+              name.value,
+              description.value,
+              null,
+              price.value,
+              stock.value,
             );
-            Get.toNamed(Routes.home);
+
+            if (res != null) {
+              Get.snackbar(
+                'Berhasil',
+                'Produk berhasil diupdate',
+                snackPosition: SnackPosition.BOTTOM,
+                margin: EdgeInsets.all(10),
+                backgroundColor: Colors.green,
+                colorText: Colors.white,
+                duration: Duration(seconds: 2),
+                animationDuration: Duration(milliseconds: 300),
+              );
+              Get.toNamed(Routes.home);
+            }
           } else {
             // create product
             final res = await createProduct(
